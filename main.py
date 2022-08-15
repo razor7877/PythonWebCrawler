@@ -3,15 +3,9 @@ from re import findall
 from Website import Website
 from WebsiteDatabase import WebsiteDatabase
 from Crawler import Crawler
-
-from datetime import datetime
-from datetime import timedelta
-
+from GraphFactory import GraphFactory
 
 def main():
-    driverPath = "C:/Users/Sandra/Desktop/Python/chromedriver.exe"
-    browserPath = "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
-    
     url = input("Enter URL to crawl: ")
 
     yesNoTuple = ("y", "n")
@@ -38,24 +32,23 @@ def main():
                 iterations = int(input("How many iterations should be done? (Keep in mind more than 1 can become exceedingly long to complete): "))
             except:
                 print("Please enter a valid number")
-        webCrawler = Crawler(driverPath, browserPath)
+        webCrawler = Crawler()
         webCrawler.recursiveCrawler(url, iterations, siteDatabase)
     else:
-        webCrawler = Crawler(driverPath, browserPath)
-        siteDatabase.foundMultiple(webCrawler.crawlWebsite(url), url)
+        webCrawler = Crawler()
+        siteDatabase.foundMultiple(webCrawler.crawlWebsite(url))
     webCrawler.endDriver()
 
     print("Finished crawling!")
-    
+
     if dumpFileYesNo == "y":
         siteDatabase.dumpToFile()
 
     if dumpConsoleYesNo == "y":
-        startTime = datetime.now()
         siteDatabase.dumpDatabase()
-        endTime = datetime.now()
-        runTime = (endTime - startTime).total_seconds()
-        print("Console dump run time: ",runTime," seconds")
+
+    factory = GraphFactory()
+    factory.graphMaker(siteDatabase)
     
 if __name__ == "__main__":
     main()

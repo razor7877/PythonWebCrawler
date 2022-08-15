@@ -9,15 +9,18 @@ class WebsiteDatabase:
         self.websites = []
     
     # Main method to call externally, automatically manages creation or update of site entries
-    def foundSite(self, url: str, timesFound: int, originUrl: str) -> None:
+    def foundSite(self, url: str, timesFound: int, originUrl = "") -> None:
         siteExists = self.findByUrl(url)
         if siteExists != None:
             siteExists.addToCounter(timesFound)
         else:
             self.addEntry(url, timesFound)
+            siteExists = self.websites[-1]
+        if originUrl != "":
+            siteExists.addLink(originUrl)
     
     # Can be used to pass multiple URLs scraped from a website
-    def foundMultiple(self, urls: list, originUrl: str) -> None:
+    def foundMultiple(self, urls: list, originUrl = "") -> None:
         for url in urls:
             self.foundSite(url, 1, originUrl)
 

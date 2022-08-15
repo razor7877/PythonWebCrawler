@@ -1,12 +1,15 @@
 # Simple class to represent the various websites encountered and store their data in an OOP friendly manner
 class Website:
     lastId = 0
-
+    urlToIds = {}
+    
     def __init__(self, url: str, timesFound: int) -> None:
-        self.id = Website.lastId
-        Website.lastId += 1
         self.url = url
         self.timesFound = timesFound
+        
+        self.id = Website.lastId
+        Website.urlToIds[url] = self.id
+        Website.lastId += 1
         self.explored = False
         self.linkedFrom = []
     
@@ -18,5 +21,12 @@ class Website:
         self.timesFound += occurrences
     
     # Adds a new URL link from where the website was found
-    def addOriginLinked(self, originUrl: str) -> None:
-        self.linkedFrom.append(originUrl)
+    def addLink(self, originUrl: str) -> None:
+        # Needs to be made better so that errors cannot occur (thus removing the need for try/except)
+        try:
+            correspondingId = Website.urlToIds[originUrl]
+            if correspondingId not in self.linkedFrom:
+                self.linkedFrom.append(correspondingId)
+        except:
+            pass
+        
