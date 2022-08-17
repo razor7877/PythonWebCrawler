@@ -1,9 +1,8 @@
 from selenium import webdriver
 from re import findall
-from Website import Website
-from WebsiteDatabase import WebsiteDatabase
-from Crawler import Crawler
-from GraphFactory import GraphFactory
+from src.WebsiteDatabase import WebsiteDatabase
+from src.Crawler import Crawler
+from src.GraphFactory import GraphFactory
 
 def main():
     url = input("Enter URL to crawl: ")
@@ -21,7 +20,8 @@ def main():
     recursiveYesNo = ""
     while recursiveYesNo not in yesNoTuple:
         recursiveYesNo = input("Do you want to do a recursive crawling? (Y/N): ").lower()
-
+    
+    # Creates a new database object
     siteDatabase = WebsiteDatabase()
     siteDatabase.clearDatabase()
     
@@ -32,11 +32,14 @@ def main():
                 iterations = int(input("How many iterations should be done? (Keep in mind more than 1 can become exceedingly long to complete): "))
             except:
                 print("Please enter a valid number")
+        # Creates a new crawler object and starts recursive crawling with parameters given by the user
         webCrawler = Crawler()
         webCrawler.recursiveCrawler(url, iterations, siteDatabase)
     else:
+        # Creates a new crawler object and starts non-recursive crawling with parameters given by the user
         webCrawler = Crawler()
-        siteDatabase.foundMultiple(webCrawler.crawlWebsite(url))
+        webCrawler.crawlOnce(url, siteDatabase)
+    # Closes the browser & driver windows
     webCrawler.endDriver()
 
     print("Finished crawling!")
@@ -45,10 +48,13 @@ def main():
         siteDatabase.dumpToFile()
 
     if dumpConsoleYesNo == "y":
-        siteDatabase.dumpDatabase()
-
+        siteDatabase.dumpToConsole()
+    
+    print("Starting graph generation with", siteDatabase.getWebsitesCount(), "nodes")
+    # Check GraphFactory class for more info if looking to play with the various parameters
     factory = GraphFactory()
     factory.graphMaker(siteDatabase)
+    print("Graph generation finished!")
     
 if __name__ == "__main__":
     main()

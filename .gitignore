@@ -1,3 +1,4 @@
 chromedriver.exe
-/__pycache__/
-crawlerDump.txt
+/src/__pycache__/
+settings.cfg
+/dumps/dump_*.txt

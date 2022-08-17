@@ -36,7 +36,7 @@ fileContent = ""
 try:
     file = open(fileName, "w")
     fileContent += "driverPath:" + driverPath + "\n"
-    fileContent += "browserPath:" + browserPath + "\n"
+    fileContent += "browserPath:" + browserPath
     file.write(fileContent)
     file.close()
     print("Settings successfully saved to", fileName)
