@@ -30,7 +30,7 @@ while not browserChoiceDone:
     if browserConfirmYesNo == "y":
         browserChoiceDone = True
 
-fileName = "settings.cfg"
+fileName = "../settings.cfg"
 fileContent = ""
 
 try:
