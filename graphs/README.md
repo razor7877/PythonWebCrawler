@@ -1,0 +1,1 @@
+The /graphs/ folder serves to store any graphs newly created using the pyVis renderer

@@ -1,0 +1,1 @@
+The /data/ folder serves to store any newly created .webdb databases files
