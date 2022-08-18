@@ -22,7 +22,7 @@ class Crawler:
         option.binary_location = self.settingsDict["browserPath"]
         option.page_load_strategy = "eager"
         self.driver = webdriver.Chrome(executable_path=self.settingsDict["driverPath"], options=option)
-        self.driver.set_page_load_timeout(5)
+        self.driver.set_page_load_timeout(10)
     
     # Dumps the HTML content from the given URL and adds them to the database passed in parameter
     def crawlWebsite(self, url: str, dataBase: WebsiteDatabase) -> list:
@@ -35,9 +35,20 @@ class Crawler:
             return parsedUrls
         return []
     
+    # Wrapper for the crawlWebsite() function
     def crawlOnce(self, url: str, dataBase: WebsiteDatabase) -> list:
-        dataBase.addEntry(url, 1)
-        self.crawlWebsite(url, dataBase)
+        # If on new database, simply explore the given URL
+        print("dataBase.isEmpty():",str(dataBase.isEmpty()))
+        if dataBase.isEmpty():
+            dataBase.addEntry(url, 1)
+            self.crawlWebsite(url, dataBase)
+        # If on an existing database, get the list of unexplored websites, and explore each once only
+        else:
+            toExplore = dataBase.getUnexplored()
+            for site in toExplore:
+                self.crawlWebsite(site.url, dataBase)
+        
+        self.endDriver()
     
     # Recursively crawls webpages with a given number of iterations and adds any new URLs to a given WebsiteDatabase
     def crawlRecursive(self, startUrl: str, repeats: int, dataBase: WebsiteDatabase) -> None:
@@ -48,18 +59,25 @@ class Crawler:
                 try:
                     site = Website.urlToSite[i]
                     if site.explored == False:
-                        site.explored = True
                         self.crawlRecursive(i, repeats-1, dataBase)
                 except:
                     pass
     
-    # This is just a wrapper for the crawlRecursive function that displays some extra information in the console
+    # Wrapper for the crawlRecursive() function that displays some extra information in the console
     def recursiveCrawler(self, startUrl: str, repeats: int, dataBase: WebsiteDatabase) -> None:
         print("Starting recursive crawling from URL:", startUrl, "with", repeats, "iterations")
         startTime = datetime.now()
         
-        dataBase.addEntry(startUrl, 1)
-        self.crawlRecursive(startUrl, repeats, dataBase)
+        # If on a new database, starts crawling recursively from the given URL with n repeats
+        if dataBase.isEmpty():
+            dataBase.addEntry(startUrl, 1)
+            self.crawlRecursive(startUrl, repeats, dataBase)
+        # If on an existing database, for each unexplored URL, starts crawling recursively with n repeats
+        else:
+            toExplore = dataBase.getUnexplored()
+            for site in toExplore:
+                self.crawlRecursive(site.url, repeats, dataBase)
+        self.endDriver()
         
         endTime = datetime.now()
         runTime = (endTime - startTime).total_seconds()

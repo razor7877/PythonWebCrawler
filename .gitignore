@@ -1,4 +1,6 @@
-chromedriver.exe
 /src/__pycache__/
+chromedriver.exe
 settings.cfg
-/dumps/dump_*.txt
+/data/*.webdb
+/dumps/*.txt
+/graphs/*.html

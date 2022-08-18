@@ -1,6 +1,7 @@
 from src.Website import Website
 from os.path import exists
 from datetime import datetime
+from pickle import dump, load
 
 # The class that serves as interface between the Crawler and Website classes
 # Manages creation of new entries, incrementation of existing ones ...
@@ -9,8 +10,18 @@ class WebsiteDatabase:
     def __init__(self) -> None:
         self.websites = []
     
-    def getUrlToSite() -> dict:
-        return Website.urlToSite
+    def isEmpty(self) -> bool:
+        if len(self.websites) == 0:
+            return True
+        return False
+    
+    # Returns a list of websites in the database that haven't been explored (used for exploring existing databases)
+    def getUnexplored(self) -> list:
+        unexploredSites = []
+        for site in self.websites:
+            if not site.explored:
+                unexploredSites.append(site)
+        return unexploredSites
     
     # Main method to call externally, automatically manages creation or update of site entries
     def foundSite(self, url: str, timesFound: int, originUrl) -> None:
@@ -23,7 +34,9 @@ class WebsiteDatabase:
     # Can be used to pass multiple URLs scraped from a website
     def foundMultiple(self, urls: list, originUrl) -> None:
         [self.foundSite(url, 1, originUrl) for url in urls]
-        Website.urlToSite[originUrl].urlCount = len(urls)
+        originWebsite = Website.urlToSite[originUrl]
+        originWebsite.urlCount = len(urls)
+        originWebsite.explored = True
     
     # Creates a new Website using the constructor and adds it to it's own websites list
     def addEntry(self, url: str, timesFound: int) -> None:
@@ -60,7 +73,7 @@ class WebsiteDatabase:
             #print("Explored:", site.explored)
             
             # Optimized way that aims to reduce the number of print() calls, same as the commented out print() calls above
-            print("\n*-----* Entry #",i, "*-----\nID:", site.id,"\nURL:", site.url,"\nTimes found:", site.timesFound,"\nLinked from:", site.linkedFrom,"\nURL count:", site.urlCount,"\nExplored:", site.explored)
+            print("\n*-----* Entry #",i, "*-----*\nID:", site.id,"\nURL:", site.url,"\nTimes found:", site.timesFound,"\nLinked from:", site.linkedFrom,"\nURL count:", site.urlCount,"\nExplored:", site.explored)
     
     # Attempts dumping the URLs that have been gathered to a text file
     def dumpToFile(self) -> None:
@@ -82,3 +95,29 @@ class WebsiteDatabase:
             print("Content successfully dumped to", fileName)
         except:
             print("There was an error while trying to dump to file")
+    
+    # Used to serialize and save an instance's data to a file for later reuse
+    def saveToFile(self):
+        print("Starting file save")
+        fileTime = datetime.now().strftime("%Y%m%d%H%M%S")
+        fileName = "data/database_" + fileTime + ".webdb"
+        try:
+            with open(fileName, "wb") as file:
+                dump(self.websites, file)
+                file.close()
+            print("Database successfully saved to", fileName)
+        except:
+            print("There was an error while trying to serialize the file")
+    
+    # Unserialize given file and loads it back into the instance
+    def loadFromFile(self, fileName):
+        print("Loading from file",fileName)
+        try:
+            with open(fileName, "rb") as file:
+                self.websites = load(file)
+            Website.lastId = len(self.websites) - 1
+            for site in self.websites:
+                Website.urlToSite[site.url] = site
+            print("Database successfully loaded from", fileName)
+        except:
+            print("There was an error while trying to unserialize the file")    

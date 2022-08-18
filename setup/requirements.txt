@@ -2,3 +2,4 @@ selenium
 networkx
 matplotlib
 scipy
+pyvis

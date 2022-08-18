@@ -1,5 +1,7 @@
 from networkx import Graph, spring_layout, draw_networkx_edges, draw_networkx_nodes, draw_networkx_labels
 import matplotlib.pyplot as plt
+from datetime import datetime
+from pyvis.network import Network
 from src.WebsiteDatabase import WebsiteDatabase
 
 class GraphFactory:
@@ -16,12 +18,20 @@ class GraphFactory:
         self.scaleNodesYesNo = scaleNodesYesNo
         # Whether edges that link nodes to themselves should be displayed or not
         self.allowLoopsYesNo = allowLoopsYesNo
-
-    def graphMaker(self, database: WebsiteDatabase) -> None:
+    
+    def graphMaker(self, dataBase: WebsiteDatabase, renderer: str) -> None:
+        if renderer == "networkx":
+            self.nxRenderer(dataBase)
+        elif renderer == "pyvis":
+            self.pyVisRenderer(dataBase)
+    
+    # The function that generates NetworkX graphs. Not responsible for the visualization, only outputs
+    # data relevant to visualization for further use
+    def nxMaker(self, dataBase: WebsiteDatabase) -> list:
         # Creates a new nx graph object, gets the passed database websites list in a local object
         # and initalizes a dictionary to match the nodes IDs with their corresponding URLs
         G = Graph()
-        websites = database.websites
+        websites = dataBase.websites
         labelDict = {}
         nodeSizes = []
         
@@ -56,7 +66,15 @@ class GraphFactory:
                 nodeSizes.append(maxNodeSize * (website.urlCount / maxUrlCount) * 10)
             else:
                 nodeSizes.append(minNodeSize * 10)
-                
+        
+        graphData = [G, labelDict, nodeSizes]
+        return graphData
+    
+    # Used to render a graph using NetworkX and matplotlib directly
+    def nxRenderer(self, dataBase: WebsiteDatabase) -> None:
+        # Unpacks the values from the graph maker
+        G, labelDict, nodeSizes = self.nxMaker(dataBase)
+        
         pos = spring_layout(G, scale=1)
         draw_networkx_edges(G, pos, edge_color="m", alpha=0.5)
         draw_networkx_nodes(G, pos, node_size=nodeSizes, node_color="#210070", alpha=0.9)
@@ -64,3 +82,28 @@ class GraphFactory:
         draw_networkx_labels(G, pos, font_size=6, bbox=label_options, labels=labelDict)
         
         plt.show()
+    
+    # Used to render a graph using pyVis instead
+    def pyVisRenderer(self, dataBase: WebsiteDatabase) -> None:
+        G, labelDict, nodeSizes = self.nxMaker(dataBase)
+        fileTime = datetime.now().strftime("%Y%m%d%H%M%S")
+        fileName = "graphs/graph_" + fileTime + ".html"
+        
+        net = Network(height="600px",width="1000px")
+        net.from_nx(G)
+        
+        for node in net.nodes:
+            node["label"] = labelDict[node["id"]]
+            node["value"] = nodeSizes[int(node["id"])]
+            node["opacity"] = 0.70
+            if node["value"] > 10:
+                node["color"] = "#162347"
+            else:
+                node["color"] = "#4b5980"
+        
+        for edge in net.edges:
+            edge
+        
+        net.show_buttons()
+        net.save_graph(fileName)
+        

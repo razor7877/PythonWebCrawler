@@ -1,29 +1,30 @@
 from selenium import webdriver
-from re import findall
 from src.WebsiteDatabase import WebsiteDatabase
 from src.Crawler import Crawler
 from src.GraphFactory import GraphFactory
+from sys import argv
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
-def main():
-    url = input("Enter URL to crawl: ")
-
-    yesNoTuple = ("y", "n")
-    dumpFileYesNo = ""
-    while dumpFileYesNo not in yesNoTuple:
-        dumpFileYesNo = input("Should the gathered URLs be dumped into a .txt file? (Y/N): ").lower()
-        print(dumpFileYesNo)
-
-    dumpConsoleYesNo = ""
-    while dumpConsoleYesNo not in yesNoTuple:
-        dumpConsoleYesNo = input("Should the gathered URLs be dumped into the console? (Keep in mind it can take a while to print everything)(Y/N): ")
+def getYesNo(textHint: str) -> str:
+    yesNoValue = ""
+    while yesNoValue not in ("y", "n"):
+        yesNoValue = input(textHint).lower()
+    return yesNoValue
     
-    recursiveYesNo = ""
-    while recursiveYesNo not in yesNoTuple:
-        recursiveYesNo = input("Do you want to do a recursive crawling? (Y/N): ").lower()
+def main(siteDatabase = WebsiteDatabase()):
+    # Parameters to determine what should be output and how the crawler should work
     
-    # Creates a new database object
-    siteDatabase = WebsiteDatabase()
-    siteDatabase.clearDatabase()
+    if siteDatabase.isEmpty():
+        url = input("Enter URL to crawl: ")
+    else:
+        url = ""
+    
+    saveDataYesNo = getYesNo("Should the database contents be saved to a file? This allows you to load and reuse the data later on. (Y/N): ")
+    dumpFileYesNo = getYesNo("Should the gathered URLs be dumped into a .txt file? (Y/N): ")
+    dumpConsoleYesNo = getYesNo("Should the gathered URLs be dumped into the console? (Keep in mind it can take a while to print everything)(Y/N): ")
+    
+    recursiveYesNo = getYesNo("Do you want to do a recursive crawling? (Y/N): ")
     
     if recursiveYesNo == "y":
         iterations = 0
@@ -39,11 +40,12 @@ def main():
         # Creates a new crawler object and starts non-recursive crawling with parameters given by the user
         webCrawler = Crawler()
         webCrawler.crawlOnce(url, siteDatabase)
-    # Closes the browser & driver windows
-    webCrawler.endDriver()
 
     print("Finished crawling!")
-
+    
+    if saveDataYesNo == "y":
+        siteDatabase.saveToFile()
+    
     if dumpFileYesNo == "y":
         siteDatabase.dumpToFile()
 
@@ -53,8 +55,15 @@ def main():
     print("Starting graph generation with", siteDatabase.getWebsitesCount(), "nodes")
     # Check GraphFactory class for more info if looking to play with the various parameters
     factory = GraphFactory()
-    factory.graphMaker(siteDatabase)
+    factory.graphMaker(siteDatabase, renderer="networkx")
     print("Graph generation finished!")
     
 if __name__ == "__main__":
-    main()
+    # If a second argument is present (file path expected), then load it into a database
+    if len(argv) > 1:
+        siteDatabase = WebsiteDatabase()
+        siteDatabase.loadFromFile(str(argv[1]))
+        main(siteDatabase)
+    # If no extra argument is passed, then simply proceed as usual
+    else:
+        main()

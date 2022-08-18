@@ -1,32 +1,30 @@
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
+def getYesNo(textHint: str) -> str:
+    yesNoValue = ""
+    while yesNoValue not in ("y", "n"):
+        yesNoValue = input(textHint).lower()
+    return yesNoValue
+
 # This is a simple script to help the user configure
 # the paths of their chrome driver & browser binaries
 
 Tk().withdraw()
 
-yesNoTuple = ("y", "n")
-
 driverChoiceDone = False
 while not driverChoiceDone:
-    print("Choose your chromedriver.exe file in the next dialog window")
-    input("Press Enter to continue to the file dialog window")
+    input("Choose your chromedriver.exe file in the next dialog window\nPress Enter to continue to the file dialog window")
     driverPath = askopenfilename(filetypes=[("Executables", "*.exe")])
-    driverConfirmYesNo = ""
-    while driverConfirmYesNo not in yesNoTuple:
-        driverConfirmYesNo = input("Is this the correct chromedriver.exe path? (Y/N): " + driverPath + " ").lower()
+    driverConfirmYesNo = getYesNo("Is this the correct chromedriver.exe path? (Y/N): " + driverPath + " ")
     if driverConfirmYesNo == "y":
         driverChoiceDone = True
 
 browserChoiceDone = False
 while not browserChoiceDone:
-    print("Choose your chrome or chromium-based (eg. Brave) binary file in the next dialog window")
-    print("Press Enter to continue to the file dialog window")
+    input("Choose your Chrome or chromium-based (eg. Brave) binary file in the next dialog window\nPress Enter to continue to the file dialog window")
     browserPath = askopenfilename(filetype=[("Executables", "*.exe")])
-    browserConfirmYesNo = ""
-    while browserConfirmYesNo not in yesNoTuple:
-        browserConfirmYesNo = input("Is this the correct browser binary path? (Y/N): " + browserPath + " ").lower()
+    browserConfirmYesNo = getYesNo("Is this the correct browser binary path? (Y/N): " + browserPath + " ")
     if browserConfirmYesNo == "y":
         browserChoiceDone = True
 
