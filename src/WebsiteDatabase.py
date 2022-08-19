@@ -82,10 +82,6 @@ class WebsiteDatabase:
         fileTime = datetime.now().strftime("%Y%m%d%H%M%S")
         fileName = "dumps/dump_" + fileTime + ".txt"
         try:
-            if exists(fileName):
-                continueYesNo = input("File " + fileName + " already exists. Overwrite it? (Y/N): ").lower()
-                if continueYesNo != "y":
-                    return
             # Gets the urls of every websites found, and writes them all to a file separated by newlines \n
             file = open(fileName, "w")
             for site in self.websites:
@@ -93,7 +89,8 @@ class WebsiteDatabase:
             file.write(fileContent)
             file.close()
             print("Content successfully dumped to", fileName)
-        except:
+        except Exception as ex:
+            print(ex)
             print("There was an error while trying to dump to file")
     
     # Used to serialize and save an instance's data to a file for later reuse
@@ -119,5 +116,6 @@ class WebsiteDatabase:
             for site in self.websites:
                 Website.urlToSite[site.url] = site
             print("Database successfully loaded from", fileName)
-        except:
+        except Exception as ex:
+            print(ex)
             print("There was an error while trying to unserialize the file")    

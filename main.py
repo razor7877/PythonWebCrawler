@@ -52,18 +52,21 @@ def main(siteDatabase = WebsiteDatabase()):
     if dumpConsoleYesNo == "y":
         siteDatabase.dumpToConsole()
     
-    print("Starting graph generation with", siteDatabase.getWebsitesCount(), "nodes")
     # Check GraphFactory class for more info if looking to play with the various parameters
     factory = GraphFactory()
     factory.graphMaker(siteDatabase, renderer="networkx")
-    print("Graph generation finished!")
     
 if __name__ == "__main__":
     # If a second argument is present (file path expected), then load it into a database
     if len(argv) > 1:
-        siteDatabase = WebsiteDatabase()
-        siteDatabase.loadFromFile(str(argv[1]))
-        main(siteDatabase)
+        try:
+            siteDatabase = WebsiteDatabase()
+            siteDatabase.loadFromFile(str(argv[1]))
+            main(siteDatabase)
+        except Exception as ex:
+            print(ex)
+            pass
+        
     # If no extra argument is passed, then simply proceed as usual
     else:
         main()

@@ -27,18 +27,21 @@ class Crawler:
     # Dumps the HTML content from the given URL and adds them to the database passed in parameter
     def crawlWebsite(self, url: str, dataBase: WebsiteDatabase) -> list:
         if fullmatch(self.urlRegex, url):
-            self.driver.get(url)
-            pageContent = self.driver.page_source
-            
-            parsedUrls = self.parseUrls(pageContent)
-            dataBase.foundMultiple(parsedUrls, url)
-            return parsedUrls
+            print("Exploring", url)
+            try:
+                self.driver.get(url)
+                pageContent = self.driver.page_source
+                
+                parsedUrls = self.parseUrls(pageContent)
+                dataBase.foundMultiple(parsedUrls, url)
+                return parsedUrls
+            except:
+                print("Error while trying to explore", url, "!")
         return []
     
     # Wrapper for the crawlWebsite() function
     def crawlOnce(self, url: str, dataBase: WebsiteDatabase) -> list:
         # If on new database, simply explore the given URL
-        print("dataBase.isEmpty():",str(dataBase.isEmpty()))
         if dataBase.isEmpty():
             dataBase.addEntry(url, 1)
             self.crawlWebsite(url, dataBase)
@@ -53,7 +56,6 @@ class Crawler:
     # Recursively crawls webpages with a given number of iterations and adds any new URLs to a given WebsiteDatabase
     def crawlRecursive(self, startUrl: str, repeats: int, dataBase: WebsiteDatabase) -> None:
         if repeats >= 0:
-            print("Exploring", startUrl)
             lastContent = self.crawlWebsite(startUrl, dataBase)
             for i in lastContent:
                 try:
