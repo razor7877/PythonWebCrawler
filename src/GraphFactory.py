@@ -64,7 +64,7 @@ class GraphFactory:
         
         # The ratio between these two determines the size differences between the largest and smallest nodes
         # 30:1 means the biggest node(s) will be 30x the size of the smallest one(s)
-        maxNodeSize = 300
+        maxNodeSize = 10
         minNodeSize = 1
 
         # Once all nodes exists, all the links are created between the nodes
@@ -80,7 +80,7 @@ class GraphFactory:
                 nodeSizes.append(maxNodeSize * (website.urlCount / maxUrlCount) * 10)
             else:
                 nodeSizes.append(minNodeSize * 10)
-        
+
         graphData = [G, labelDict, nodeSizes]
         return graphData
     
@@ -111,16 +111,21 @@ class GraphFactory:
         counter = 0
         for node in net.nodes:
             node["label"] = labelDict[node["id"]]
-            node["value"] = nodeSizes[counter]
+            node["size"] = nodeSizes[counter]
             node["opacity"] = 0.70
-            if node["value"] > 10:
-                node["color"] = "#162347"
+            if node["size"] > 150:
+                node["color"] = "#0036c9"
+            elif node["size"] > 50:
+                node["color"] = "#224fc9"
+            elif node["size"] > 10:
+                node["color"] = "#4467c7"
             else:
-                node["color"] = "#4b5980"
+                node["color"] = "#7288c4"
             
             counter += 1
         
         net.show_buttons()
+        
         net.save_graph(fileName)
     
     # Function used for applying the parameters related to whether subdomains and domains/paths should be distinguished
@@ -142,8 +147,6 @@ class GraphFactory:
         oldIdsToLinks = {}
         idsNewToOld = {}
         idsOldToNew = {}
-        
-        corruptedIds = []
         
         for site in dataBase.websites:
             try:
