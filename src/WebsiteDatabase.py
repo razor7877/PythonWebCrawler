@@ -97,7 +97,7 @@ class WebsiteDatabase:
     def saveToFile(self):
         print("Starting file save")
         fileTime = datetime.now().strftime("%Y%m%d%H%M%S")
-        fileName = "data/database_" + fileTime + ".webdb"
+        fileName = "data/database_" + fileTime + ".pickle"
         try:
             with open(fileName, "wb") as file:
                 dump(self.websites, file)

@@ -1,7 +1,7 @@
 /src/__pycache__/
 chromedriver.exe
 settings.cfg
-/data/*.webdb
+/data/*.pickle
 /dumps/*.txt
 /graphs/*.html
 /lib/

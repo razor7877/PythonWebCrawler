@@ -34,7 +34,8 @@ fileContent = ""
 try:
     file = open(fileName, "w")
     fileContent += "driverPath:" + driverPath + "\n"
-    fileContent += "browserPath:" + browserPath
+    fileContent += "browserPath:" + browserPath + "\n"
+    fileContent += "renderer:pyvis"
     file.write(fileContent)
     file.close()
     print("Settings successfully saved to", fileName)
