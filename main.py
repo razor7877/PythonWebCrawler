@@ -54,7 +54,7 @@ def main(siteDatabase = WebsiteDatabase()):
     
     # Check GraphFactory class for more info if looking to play with the various parameters
     factory = GraphFactory()
-    factory.graphMaker(siteDatabase, renderer="networkx")
+    factory.graphMaker(siteDatabase, renderer="pyvis")
     
 if __name__ == "__main__":
     # If a second argument is present (file path expected), then load it into a database
