@@ -1,1 +1,1 @@
-The /data/ folder serves to store any newly created .webdb databases files
+The /data/ folder serves to store any newly created .pickle databases files
